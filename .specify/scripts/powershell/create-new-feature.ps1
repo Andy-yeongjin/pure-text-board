@@ -135,19 +135,26 @@ if (-not $fallbackRoot) {
     exit 1
 }
 
+$repoRoot = $null
 try {
-    $repoRoot = git rev-parse --show-toplevel 2>$null
-    if ($LASTEXITCODE -eq 0) {
+    # Try to get git root, but handle potential errors gracefully
+    $gitRootRaw = git rev-parse --show-toplevel 2>$null
+    if ($LASTEXITCODE -eq 0 -and $gitRootRaw) {
+        $repoRoot = $gitRootRaw
         $hasGit = $true
     } else {
-        throw "Git not available"
+        $repoRoot = $fallbackRoot
+        $hasGit = $false
     }
 } catch {
     $repoRoot = $fallbackRoot
     $hasGit = $false
 }
 
-Set-Location $repoRoot
+# Only change location if repoRoot is different from current location to minimize encoding-related failures
+# if ((Get-Location).Path -ne $repoRoot) {
+#     Set-Location $repoRoot
+# }
 
 $specsDir = Join-Path $repoRoot 'specs'
 New-Item -ItemType Directory -Path $specsDir -Force | Out-Null
