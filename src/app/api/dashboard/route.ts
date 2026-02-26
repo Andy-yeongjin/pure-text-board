@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { client } from "@/lib/sanity";
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     // 1. 서비스 통계 (공개 게시글 수, 전체 사용자 수)
