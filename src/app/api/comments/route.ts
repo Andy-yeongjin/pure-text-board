@@ -1,25 +1,33 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { client, writeClient } from '@/lib/sanity';
 import { getAuthUser } from '@/lib/auth';
-
-const prisma = new PrismaClient();
 
 export async function POST(request: Request) {
   const user = getAuthUser();
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  if (!user || !user.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
     const { postId, content } = await request.json();
-    const comment = await prisma.comment.create({
-      data: {
-        postId,
-        content,
-        authorId: user.id,
-      },
-      include: { author: { select: { name: true } } },
+    
+    // 댓글 생성
+    const comment = await writeClient.create({
+      _type: 'comment',
+      post: { _type: 'reference', _ref: postId },
+      author: { _type: 'reference', _ref: user.id },
+      content,
+      isDeleted: false,
+      createdAt: new Date().toISOString()
     });
-    return NextResponse.json(comment);
+
+    return NextResponse.json({
+      id: comment._id,
+      content: comment.content,
+      author: { name: user.name },
+      isDeleted: false,
+      createdAt: comment.createdAt
+    });
   } catch (error) {
+    console.error('Create comment error:', error);
     return NextResponse.json({ error: 'Failed to create comment' }, { status: 500 });
   }
 }
@@ -28,14 +36,16 @@ export async function DELETE(
   request: Request,
   { params }: { params: { id: string } }
 ) {
-  // 실제 서비스라면 본인 확인 로직 필요
   try {
-    await prisma.comment.update({
-      where: { id: parseInt(params.id) },
-      data: { isDeleted: true },
-    });
+    const id = params.id;
+    await writeClient
+      .patch(id)
+      .set({ isDeleted: true })
+      .commit();
+      
     return NextResponse.json({ success: true });
   } catch (error) {
+    console.error('Delete comment error:', error);
     return NextResponse.json({ error: 'Failed to delete comment' }, { status: 500 });
   }
 }

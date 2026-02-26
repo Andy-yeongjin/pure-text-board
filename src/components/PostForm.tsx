@@ -5,10 +5,9 @@ import { useRouter } from 'next/navigation';
 
 interface PostFormProps {
   initialData?: {
-    id: number;
+    id: string;
     title: string;
     content: string;
-    isPrivate: boolean;
   };
 }
 
@@ -16,8 +15,6 @@ export const PostForm = ({ initialData }: PostFormProps) => {
   const router = useRouter();
   const [title, setTitle] = useState(initialData?.title || '');
   const [content, setContent] = useState(initialData?.content || '');
-  const [isPrivate, setIsPrivate] = useState(initialData?.isPrivate || false);
-  const [privatePw, setPrivatePw] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,7 +24,8 @@ export const PostForm = ({ initialData }: PostFormProps) => {
 
     const res = await fetch(url, {
       method,
-      body: JSON.stringify({ title, content, isPrivate, privatePw }),
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title, content }),
     });
 
     if (res.ok) {
@@ -54,34 +52,7 @@ export const PostForm = ({ initialData }: PostFormProps) => {
         rows={10}
         required 
       />
-      <label style={{ 
-        display: 'flex', 
-        alignItems: 'center', 
-        gap: '10px', 
-        cursor: 'pointer',
-        padding: '10px 0',
-        userSelect: 'none',
-        fontWeight: '600',
-        color: 'var(--text-main)'
-      }}>
-        <input 
-          type="checkbox" 
-          checked={isPrivate} 
-          onChange={(e) => setIsPrivate(e.target.checked)}
-          style={{ width: '18px', height: '18px', cursor: 'pointer' }}
-        />
-        비밀글로 설정하기
-      </label>
-      {isPrivate && (
-        <input 
-          type="password" 
-          placeholder="비밀번호 (4자리 이상)" 
-          value={privatePw} 
-          onChange={(e) => setPrivatePw(e.target.value)} 
-          required 
-          minLength={4}
-        />
-      )}
+      
       <div style={{ display: 'flex', gap: '12px', marginTop: '10px' }}>
         <button 
           type="submit" 

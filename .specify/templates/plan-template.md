@@ -1,5 +1,7 @@
 # Implementation Plan: [FEATURE]
 
+**지침: 모든 계획서 내용은 반드시 한글로 작성합니다.**
+
 **Branch**: `[###-feature-name]` | **Date**: [DATE] | **Spec**: [link]
 **Input**: Feature specification from `/specs/[###-feature-name]/spec.md`
 

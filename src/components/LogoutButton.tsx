@@ -6,11 +6,8 @@ export const LogoutButton = () => {
   const router = useRouter();
 
   const handleLogout = async () => {
-    const res = await fetch('/api/auth/logout', { method: 'POST' });
-    if (res.ok) {
-      router.push('/login');
-      router.refresh(); // 페이지를 새로고침하여 레이아웃의 상태 업데이트
-    }
+    // 공통 서버의 로그아웃 API 호출 (모든 쿠키 제거 로직 포함)
+    window.location.href = '/api/common/logout';
   };
 
   return (

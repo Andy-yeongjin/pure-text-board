@@ -1,11 +1,12 @@
+'use client';
+
 import React from 'react';
 
 interface PostDetailProps {
   post: {
-    id: number;
+    id: string;
     title: string;
     content: string | null;
-    isPrivate: boolean;
     author: { name: string };
     viewCount: number;
     createdAt: string;
@@ -24,7 +25,6 @@ export const PostDetail = ({ post }: PostDetailProps) => {
       <div style={{ padding: '40px' }}>
         <header style={{ marginBottom: '30px' }}>
           <h1 style={{ fontSize: '2.5rem', margin: '0 0 20px 0', lineHeight: 1.2 }}>
-            {post.isPrivate && <span style={{ marginRight: '10px' }}>🔒</span>}
             {post.title}
           </h1>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -45,25 +45,44 @@ export const PostDetail = ({ post }: PostDetailProps) => {
           fontSize: '1.15rem', 
           lineHeight: 1.8, 
           whiteSpace: 'pre-wrap', 
-          padding: '30px', 
+          padding: '40px 30px', 
           backgroundColor: '#f8fafc', 
-          borderRadius: '12px',
+          borderRadius: '16px',
           border: '1px solid var(--border-color)',
-          color: '#334155'
+          color: '#334155',
+          textAlign: 'left'
         }}>
-          {post.isPrivate && post.content === null ? (
-            <div style={{ textAlign: 'center', padding: '40px 0' }}>
-              <span style={{ fontSize: '3rem' }}>🔐</span>
-              <p style={{ color: '#ef4444', fontWeight: 'bold' }}>비밀글로 보호되고 있습니다.</p>
-              <p style={{ color: 'var(--text-muted)' }}>본문을 보려면 비밀번호를 입력하세요.</p>
-            </div>
-          ) : (
-            post.content
-          )}
+          {post.content}
         </div>
         
-        <div style={{ marginTop: '30px' }}>
-          <a href="/posts" style={{ color: 'var(--primary)', fontWeight: 'bold' }}>← 목록으로 돌아가기</a>
+        <div style={{ marginTop: '40px', borderTop: '1px solid var(--border-color)', paddingTop: '30px' }}>
+          <a 
+            href="/posts" 
+            style={{ 
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '12px 24px',
+              backgroundColor: 'white',
+              border: '2px solid var(--primary)',
+              color: 'var(--primary)',
+              borderRadius: '10px',
+              textDecoration: 'none',
+              fontWeight: '700',
+              transition: 'all 0.2s ease',
+              fontSize: '1rem'
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.backgroundColor = 'var(--primary)';
+              e.currentTarget.style.color = 'white';
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.backgroundColor = 'white';
+              e.currentTarget.style.color = 'var(--primary)';
+            }}
+          >
+            <span style={{ fontSize: '1.2rem' }}>📋</span> 목록으로 돌아가기
+          </a>
         </div>
       </div>
     </div>

@@ -1,36 +1,40 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { client, writeClient } from '@/lib/sanity';
 import { getAuthUser } from '@/lib/auth';
-
-const prisma = new PrismaClient();
 
 export async function POST(
   request: Request,
   { params }: { params: { id: string } }
 ) {
   const user = getAuthUser();
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  if (!user || !user.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const postId = parseInt(params.id);
+  const postId = params.id;
 
   try {
-    const existing = await prisma.like.findUnique({
-      where: { userId_postId: { userId: user.id, postId } },
-    });
+    // 기존 좋아요 확인
+    const existing = await client.fetch(`
+      *[_type == "like" && post._ref == $postId && user._ref == $userId][0]
+    `, { postId, userId: user.id });
 
     if (existing) {
-      await prisma.like.delete({
-        where: { userId_postId: { userId: user.id, postId } },
-      });
+      await writeClient.delete(existing._id);
     } else {
-      await prisma.like.create({
-        data: { userId: user.id, postId },
+      await writeClient.create({
+        _type: 'like',
+        post: { _type: 'reference', _ref: postId },
+        user: { _type: 'reference', _ref: user.id }
       });
     }
 
-    const count = await prisma.like.count({ where: { postId } });
+    // 새로운 좋아요 합계 조회
+    const count = await client.fetch(`
+      count(*[_type == "like" && post._ref == $postId])
+    `, { postId });
+
     return NextResponse.json({ liked: !existing, count });
   } catch (error) {
+    console.error('Like toggle error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
