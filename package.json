@@ -7,14 +7,16 @@
     "dev": "node server.js",
     "build": "next build",
     "start": "node server.js",
+    "sanity:dev": "sanity dev",
+    "sanity:build": "sanity build",
     "db:seed": "node src/db/seed.js",
     "lint": "next lint",
     "test": "jest",
     "test:e2e": "playwright test"
   },
   "dependencies": {
+    "@sanity/client": "^7.16.0",
     "bcryptjs": "^2.4.3",
-    "better-sqlite3": "^12.6.2",
     "cookie": "^0.6.0",
     "cookie-parser": "^1.4.7",
     "dotenv": "^17.3.1",
@@ -23,6 +25,7 @@
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.1",
     "next": "^14.2.0",
+    "next-sanity": "^9.12.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },

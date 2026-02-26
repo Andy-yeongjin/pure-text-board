@@ -1,10 +1,9 @@
 import React from 'react';
 
 interface PostSummary {
-  id: number;
+  id: string;
   title: string;
   author: { name: string };
-  isPrivate: boolean;
   viewCount: number;
   createdAt: string;
   _count: { likes: number; comments: number };
@@ -34,9 +33,6 @@ export const PostList = ({ posts }: { posts: PostSummary[] }) => {
                 backgroundPosition: 'center'
               }} />
               <div style={{ padding: '20px' }}>
-                <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
-                  {post.isPrivate && <span style={{ background: '#fee2e2', color: '#ef4444', padding: '2px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: 'bold' }}>PRIVATE</span>}
-                </div>
                 <h3 style={{ margin: '0 0 10px 0', fontSize: '1.25rem', height: '1.5em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {post.title}
                 </h3>

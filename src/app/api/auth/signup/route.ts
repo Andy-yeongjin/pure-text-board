@@ -1,27 +1,33 @@
 import { NextResponse } from 'next/server';
-import db from '@/lib/db';
+import { client, writeClient } from '@/lib/sanity';
 import bcrypt from 'bcryptjs';
 
 export async function POST(request: Request) {
   try {
     const { email, password, name } = await request.json();
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    
-    const info = db.prepare(`
-      INSERT INTO User (email, password, name, createdAt)
-      VALUES (?, ?, ?, datetime('now'))
-    `).run(email, hashedPassword, name);
-
-    const user = db.prepare('SELECT id, email, name, createdAt FROM User WHERE id = ?')
-      .get(info.lastInsertRowid);
-
-    return NextResponse.json(user);
-  } catch (error) {
-    console.error('Signup error:', error);
-    if ((error as any).code === 'SQLITE_CONSTRAINT_UNIQUE') {
+    // 중복 이메일 확인
+    const existing = await client.fetch(`*[_type == "user" && email == $email][0]`, { email });
+    if (existing) {
       return NextResponse.json({ error: 'Email already exists' }, { status: 400 });
     }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    
+    const user = await writeClient.create({
+      _type: 'user',
+      email,
+      password: hashedPassword,
+      name
+    });
+
+    return NextResponse.json({
+      id: user._id,
+      email: user.email,
+      name: user.name
+    });
+  } catch (error) {
+    console.error('Signup error:', error);
     return NextResponse.json({ error: 'Signup failed' }, { status: 500 });
   }
 }

@@ -1,14 +1,12 @@
 'use client';
 
 import React from 'react';
-import { PrivateAuthForm } from './PrivateAuthForm';
 
 interface PostDetailProps {
   post: {
-    id: number;
+    id: string;
     title: string;
     content: string | null;
-    isPrivate: boolean;
     author: { name: string };
     viewCount: number;
     createdAt: string;
@@ -16,8 +14,6 @@ interface PostDetailProps {
 }
 
 export const PostDetail = ({ post }: PostDetailProps) => {
-  const isLocked = post.isPrivate && post.content === null;
-
   return (
     <div className="card" style={{ marginBottom: '30px' }}>
       <div style={{ 
@@ -29,7 +25,6 @@ export const PostDetail = ({ post }: PostDetailProps) => {
       <div style={{ padding: '40px' }}>
         <header style={{ marginBottom: '30px' }}>
           <h1 style={{ fontSize: '2.5rem', margin: '0 0 20px 0', lineHeight: 1.2 }}>
-            {post.isPrivate && <span style={{ marginRight: '10px' }}>🔒</span>}
             {post.title}
           </h1>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -50,30 +45,14 @@ export const PostDetail = ({ post }: PostDetailProps) => {
           fontSize: '1.15rem', 
           lineHeight: 1.8, 
           whiteSpace: 'pre-wrap', 
-          padding: isLocked ? '60px 30px' : '40px 30px', 
+          padding: '40px 30px', 
           backgroundColor: '#f8fafc', 
           borderRadius: '16px',
           border: '1px solid var(--border-color)',
           color: '#334155',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: isLocked ? 'center' : 'flex-start',
-          textAlign: isLocked ? 'center' : 'left'
+          textAlign: 'left'
         }}>
-          {isLocked ? (
-            <div style={{ width: '100%', maxWidth: '500px' }}>
-              <span style={{ fontSize: '4rem', display: 'block', marginBottom: '24px' }}>🔐</span>
-              <h2 style={{ color: '#ef4444', fontWeight: '900', fontSize: '1.5rem', margin: '0 0 12px 0' }}>
-                비밀글로 보호되고 있습니다.
-              </h2>
-              <p style={{ color: 'var(--text-muted)', margin: 0, fontSize: '1rem', fontWeight: '500' }}>
-                게시글 비밀번호를 입력하여 본문을 확인하세요.
-              </p>
-              <PrivateAuthForm postId={post.id} />
-            </div>
-          ) : (
-            post.content
-          )}
+          {post.content}
         </div>
         
         <div style={{ marginTop: '40px', borderTop: '1px solid var(--border-color)', paddingTop: '30px' }}>

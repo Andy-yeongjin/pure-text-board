@@ -5,10 +5,8 @@ import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import next from 'next';
 import jwt from 'jsonwebtoken';
-import Database from 'better-sqlite3'; 
-import bcrypt from 'bcryptjs';
 import path from 'path';
-import dotenv from 'dotenv'; // dotenv 추가
+import dotenv from 'dotenv';
 
 // .env 파일 로드
 dotenv.config();
@@ -17,9 +15,6 @@ const SECRET_KEY = process.env.JWT_SECRET || 'shared-secret-key';
 console.log(`> [Shared Server] Using JWT Secret: ${SECRET_KEY.substring(0, 4)}****`);
 
 export default function startSharedServer(projectDir, port = 3000) {
-  const dbPath = path.join(projectDir, 'src/db/dev.db');
-  const db = new Database(dbPath);
-
   const dev = process.env.NODE_ENV !== 'production';
   const app = next({ dev, dir: projectDir });
   const handle = app.getRequestHandler();
@@ -48,7 +43,7 @@ export default function startSharedServer(projectDir, port = 3000) {
 
     // [Constitution 준수] 공통 헬스 체크 API
     server.get('/api/common/health', (req, res) => {
-      res.json({ status: 'ok', timestamp: new Date().toISOString(), mode: 'SQLite' });
+      res.json({ status: 'ok', timestamp: new Date().toISOString(), mode: 'Sanity CMS' });
     });
 
     // [Common] 공통 약관 페이지
@@ -126,28 +121,6 @@ export default function startSharedServer(projectDir, port = 3000) {
       `);
     });
 
-    // 로그인 API
-    server.post('/api/common/login', async (req, res) => {
-      const { email, password } = req.body;
-      try {
-        const user = db.prepare('SELECT * FROM User WHERE email = ?').get(email);
-        if (user && await bcrypt.compare(password, user.password)) {
-          const token = jwt.sign(
-            { id: user.id, email: user.email, name: user.name }, 
-            SECRET_KEY, 
-            { expiresIn: '1d' }
-          );
-          res.cookie('auth_token', token, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
-          res.redirect('/');
-        } else {
-          res.redirect('/login?error=1');
-        }
-      } catch (error) {
-        console.error('SQLite Login Error:', error);
-        res.redirect('/common-error?code=500&message=로그인 처리 중 오류가 발생했습니다.');
-      }
-    });
-
     server.get('/api/common/logout', (req, res) => {
       // 모든 쿠키 확인 후 비밀글 관련 쿠키 제거
       Object.keys(req.cookies).forEach(cookieName => {
@@ -205,7 +178,7 @@ export default function startSharedServer(projectDir, port = 3000) {
     server.all(/.*/, (req, res) => handle(req, res));
 
     server.listen(port, () => {
-      console.log(`\n> [Shared Server] Pure SQLite Mode Active`);
+      console.log(`\n> [Shared Server] Sanity CMS Mode Active`);
       console.log(`> Local: http://localhost:${port}\n`);
     });
   });

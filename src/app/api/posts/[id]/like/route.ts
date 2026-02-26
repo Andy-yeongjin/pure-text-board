@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import db from '@/lib/db';
+import { client, writeClient } from '@/lib/sanity';
 import { getAuthUser } from '@/lib/auth';
 
 export async function POST(
@@ -7,28 +7,32 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   const user = getAuthUser();
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  if (!user || !user.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const postId = parseInt(params.id);
+  const postId = params.id;
 
   try {
-    const existing = db.prepare('SELECT id FROM Like WHERE userId = ? AND postId = ?')
-      .get(user.id, postId);
+    // 기존 좋아요 확인
+    const existing = await client.fetch(`
+      *[_type == "like" && post._ref == $postId && user._ref == $userId][0]
+    `, { postId, userId: user.id });
 
-    db.transaction(() => {
-      if (existing) {
-        db.prepare('DELETE FROM Like WHERE userId = ? AND postId = ?')
-          .run(user.id, postId);
-      } else {
-        db.prepare('INSERT INTO Like (userId, postId) VALUES (?, ?)')
-          .run(user.id, postId);
-      }
-    })();
+    if (existing) {
+      await writeClient.delete(existing._id);
+    } else {
+      await writeClient.create({
+        _type: 'like',
+        post: { _type: 'reference', _ref: postId },
+        user: { _type: 'reference', _ref: user.id }
+      });
+    }
 
-    const countResult = db.prepare('SELECT COUNT(*) as count FROM Like WHERE postId = ?')
-      .get(postId) as any;
-    
-    return NextResponse.json({ liked: !existing, count: countResult.count });
+    // 새로운 좋아요 합계 조회
+    const count = await client.fetch(`
+      count(*[_type == "like" && post._ref == $postId])
+    `, { postId });
+
+    return NextResponse.json({ liked: !existing, count });
   } catch (error) {
     console.error('Like toggle error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

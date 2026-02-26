@@ -6,7 +6,7 @@ export async function POST(
   request: Request,
   { params }: { params: { id: string } }
 ) {
-  const id = parseInt(params.id);
+  const id = params.id; // parseInt 제거
   const { password } = await request.json();
 
   try {

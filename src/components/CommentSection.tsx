@@ -3,14 +3,14 @@
 import React, { useState } from 'react';
 
 interface Comment {
-  id: number;
+  id: string;
   content: string;
   isDeleted: boolean;
   author: { name: string };
   createdAt: string;
 }
 
-export const CommentSection = ({ postId, initialComments }: { postId: number, initialComments: Comment[] }) => {
+export const CommentSection = ({ postId, initialComments }: { postId: string, initialComments: Comment[] }) => {
   const [comments, setComments] = useState(initialComments);
   const [newComment, setNewComment] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -41,7 +41,7 @@ export const CommentSection = ({ postId, initialComments }: { postId: number, in
     }
   };
 
-  const handleDelete = async (commentId: number) => {
+  const handleDelete = async (commentId: string) => {
     if (!confirm('댓글을 삭제하시겠습니까?')) return;
     
     const res = await fetch(`/api/comments/${commentId}`, { method: 'DELETE' });

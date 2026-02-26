@@ -1,32 +1,30 @@
 import { NextResponse } from 'next/server';
-import db from '@/lib/db';
+import { client, writeClient } from '@/lib/sanity';
 import { getAuthUser } from '@/lib/auth';
 
 export async function POST(request: Request) {
   const user = getAuthUser();
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  if (!user || !user.id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   try {
     const { postId, content } = await request.json();
     
     // 댓글 생성
-    const info = db.prepare(`
-      INSERT INTO Comment (postId, content, authorId, createdAt, isDeleted)
-      VALUES (?, ?, ?, datetime('now'), 0)
-    `).run(postId, content, user.id);
-
-    // 생성된 댓글 조회 (작성자 포함)
-    const comment = db.prepare(`
-      SELECT c.*, u.name as authorName
-      FROM Comment c
-      JOIN User u ON c.authorId = u.id
-      WHERE c.id = ?
-    `).get(info.lastInsertRowid);
+    const comment = await writeClient.create({
+      _type: 'comment',
+      post: { _type: 'reference', _ref: postId },
+      author: { _type: 'reference', _ref: user.id },
+      content,
+      isDeleted: false,
+      createdAt: new Date().toISOString()
+    });
 
     return NextResponse.json({
-      ...comment,
-      author: { name: comment.authorName },
-      isDeleted: comment.isDeleted === 1
+      id: comment._id,
+      content: comment.content,
+      author: { name: user.name },
+      isDeleted: false,
+      createdAt: comment.createdAt
     });
   } catch (error) {
     console.error('Create comment error:', error);
@@ -39,8 +37,12 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const id = parseInt(params.id);
-    db.prepare('UPDATE Comment SET isDeleted = 1 WHERE id = ?').run(id);
+    const id = params.id;
+    await writeClient
+      .patch(id)
+      .set({ isDeleted: true })
+      .commit();
+      
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Delete comment error:', error);

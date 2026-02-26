@@ -26,7 +26,7 @@ export default async function PostDetailPage({ params }: { params: { id: string 
 
   if (!post) return <div>게시글을 찾을 수 없습니다.</div>;
 
-  const liked = user && post.likes ? post.likes.some((l: any) => l.userId === user.id) : false;
+  const liked = user && post.likes ? post.likes.some((l: any) => l.user?._ref === user.id) : false;
   const isAuthor = user && post.authorId === user.id;
 
   return (
@@ -55,23 +55,21 @@ export default async function PostDetailPage({ params }: { params: { id: string 
       
       <PostDetail post={post} />
       
-      {/* 본문이 공개된 경우에만 좋아요와 댓글 표시 */}
-      {(!post.isPrivate || post.content !== null) && (
-        <div style={{ padding: '20px' }}>
-          <div style={{ marginBottom: '20px' }}>
-            <LikeButton 
-              postId={post.id} 
-              initialLikes={post.likes.length} 
-              initialLiked={liked}
-              viewCount={post.viewCount}
-            />
-          </div>
-          <CommentSection 
+      {/* Sanity 통합 후에는 모든 글이 공개글이므로 상호작용 영역 항상 표시 */}
+      <div style={{ padding: '20px' }}>
+        <div style={{ marginBottom: '20px' }}>
+          <LikeButton 
             postId={post.id} 
-            initialComments={post.comments} 
+            initialLikes={post.likes.length} 
+            initialLiked={liked}
+            viewCount={post.viewCount}
           />
         </div>
-      )}
+        <CommentSection 
+          postId={post.id} 
+          initialComments={post.comments} 
+        />
+      </div>
     </main>
   );
 }

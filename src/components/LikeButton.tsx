@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 
 interface LikeButtonProps {
-  postId: number;
+  postId: string;
   initialLikes: number;
   initialLiked: boolean;
   viewCount: number; // 조회수 추가

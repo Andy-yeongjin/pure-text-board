@@ -24,7 +24,7 @@ export const getAuthUser = (): AuthUser | null => {
   }
 };
 
-export const hasPrivateAccess = (postId: number): boolean => {
+export const hasPrivateAccess = (postId: string): boolean => {
   const cookieStore = cookies();
   const accessToken = cookieStore.get(`private_access_${postId}`)?.value;
   return !!accessToken;
