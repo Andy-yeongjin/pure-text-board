@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import { client, writeClient } from '@/lib/sanity';
 import { filterPlainText } from '@/lib/text-filter';
 import { getAuthUser } from '@/lib/auth';
+import { revalidatePath } from 'next/cache';
+
+export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
@@ -60,6 +63,12 @@ export async function POST(request: Request) {
       viewCount: 0,
       publishedAt: new Date().toISOString()
     });
+
+    // 캐시 무효화 (목록 및 대시보드 통계 갱신)
+    revalidatePath('/posts');
+    revalidatePath('/');
+    revalidatePath('/api/posts');
+    revalidatePath('/api/dashboard');
 
     return NextResponse.json({
       id: post._id,
