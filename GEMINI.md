@@ -22,7 +22,7 @@ src/
 ```
 
 ## Recent Changes
-- **UI Stability Fix (2026-02-26)**: `NavBreadcrumb` 컴포넌트에서 `usePathname()`이 `null`을 반환할 때 발생하는 런타임 오류(`TypeError: useContext`)를 방어 로직 추가로 해결.
-- **Build Optimization (2026-02-26)**: Playwright 테스트 러너 및 누락된 TypeScript 타입 패키지(@types/*) 보강으로 `npm run build` 성공 확인.
-- **004-sanity-cms**: SQLite를 완전히 제거하고 모든 데이터를 Sanity CMS로 이전 완료.
+- **Real-time Data & Cache Invalidation (2026-02-26)**: 대시보드 통계 실시간 반영을 위한 `force-dynamic` 설정 및 게시글 작성 시 목록/메인 캐시 무효화(`revalidatePath`) 로직 추가.
+- **Vercel Deployment (2026-02-26)**: Vercel CLI를 통한 프로젝트 연동, 환경 변수 자동화 설정 및 프로덕션 배포 완료.
+- **UI Stability Fix (2026-02-26)**: `NavBreadcrumb` 컴포넌트에서 `usePathname()`이 `null`을 반환할 때 발생하는 런타임 오류 해결.
 - **Home Page Revamp**: 본질에 집중한 히어로 섹션 및 서비스 통계 중심의 미니멀 디자인 적용.

@@ -5,6 +5,8 @@ import { usePathname } from 'next/navigation';
 export const NavBreadcrumb = () => {
   const pathname = usePathname();
 
+  if (!pathname) return null;
+
   const getLabel = (path: string) => {
     if (path === '/posts') return '목록';
     if (path === '/posts/new') return '새 글 작성';
