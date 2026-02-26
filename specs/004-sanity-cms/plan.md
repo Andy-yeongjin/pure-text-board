@@ -6,16 +6,17 @@
 
 ## Summary
 
-본 프로젝트는 Vercel 등의 서버리스 환경에서 SQLite 파일의 데이터 휘발성 문제를 해결하기 위해, 모든 영구 데이터를 **Sanity CMS(Cloud)**로 이전 및 통합합니다. `better-sqlite3` 의존성을 제거하고 `next-sanity`를 사용하여 게시글 관리 및 통합 인증을 구현합니다.
+본 프로젝트는 Vercel 등의 서버리스 환경에서 SQLite 파일의 데이터 휘발성 문제를 해결하기 위해, 모든 영구 데이터를 **Sanity CMS(Cloud)**로 이전 및 통합합니다. `better-sqlite3` 의존성을 제거하고 `next-sanity`를 사용하여 게시글 관리 및 통합 인증을 구현합니다. 또한 빌드 과정에서 발견된 Playwright 테스트 환경 및 TypeScript 타입 불일치 문제를 해결하여 프로덕션 빌드 무결성을 확보했습니다.
 
 ## Technical Context
 
 - **Language/Version**: TypeScript
 - **Framework**: Next.js 14 (App Router)
 - **CMS**: Sanity CMS (Headless CMS)
-- **Primary Dependencies**: `next-sanity`, `@sanity/client`, `jsonwebtoken`, `bcryptjs`
+- **Primary Dependencies**: `next-sanity`, `@sanity/client`, `jsonwebtoken`, `bcryptjs`, `@playwright/test`
+- **Typing Support**: `@types/jsonwebtoken`, `@types/cookie`, `@types/cookie-parser`, `@types/morgan`, `@types/express`, `@types/bcryptjs`
 - **Storage**: Sanity Cloud Dataset
-- **Testing**: Manual verification, Sanity Studio validation
+- **Testing**: Manual verification, Sanity Studio validation, Playwright E2E Test Suite
 - **Project Type**: Web Service (Full-stack)
 
 ## Constitution Check

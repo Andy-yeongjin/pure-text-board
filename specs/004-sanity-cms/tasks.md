@@ -29,8 +29,12 @@
 - [x] T013 [US2] 좋아요 토글 및 카운트 조회를 Sanity API 기반으로 재구현
 - [x] T014 [US2] 로그인 API(`/api/auth/login`)에서 Sanity 유저 데이터를 사용하여 인증 수행
 
-## Final Phase: Cleanup & Polish - COMPLETE ✅
+## Final Phase: Cleanup & Build Polish - COMPLETE ✅
 
 - [x] T015 [ARCH] `better-sqlite3` 패키지 및 `src/lib/db.ts` 참조 완전 제거
 - [x] T016 `src/db/dev.db` 파일 및 SQLite 관련 잔재 정리 (일부 파일은 재부팅 후 삭제 권장)
-- [x] T017 전체 서비스 통합 테스트 및 Vercel 배포 준비 완료 가이드 업데이트
+- [x] T017 [BUG] `@playwright/test` 설치 및 `playwright.config.ts` 타입 오류 해결
+- [x] T018 [BUG] `jsonwebtoken`, `cookie` 등 라이브러리의 TypeScript 타입 패키지(@types/*) 설치
+- [x] T019 `npm run build`를 통한 전체 프로젝트 빌드 무결성 확인
+- [x] T020 Jest 유닛 테스트 및 Playwright 통합 테스트 실행 확인
+- [x] T021 전체 서비스 통합 테스트 및 Vercel 배포 준비 완료 가이드 업데이트
