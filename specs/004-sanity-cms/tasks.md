@@ -35,6 +35,7 @@
 - [x] T016 `src/db/dev.db` 파일 및 SQLite 관련 잔재 정리 (일부 파일은 재부팅 후 삭제 권장)
 - [x] T017 [BUG] `@playwright/test` 설치 및 `playwright.config.ts` 타입 오류 해결
 - [x] T018 [BUG] `jsonwebtoken`, `cookie` 등 라이브러리의 TypeScript 타입 패키지(@types/*) 설치
-- [x] T019 `npm run build`를 통한 전체 프로젝트 빌드 무결성 확인
-- [x] T020 Jest 유닛 테스트 및 Playwright 통합 테스트 실행 확인
-- [x] T021 전체 서비스 통합 테스트 및 Vercel 배포 준비 완료 가이드 업데이트
+- [x] T019 [BUG] `NavBreadcrumb`의 `usePathname` null 참조 오류 해결 (UI 안정성 확보)
+- [x] T020 `npm run build`를 통한 전체 프로젝트 빌드 무결성 확인
+- [x] T021 Jest 유닛 테스트 및 Playwright 통합 테스트 실행 확인
+- [x] T022 전체 서비스 통합 테스트 및 Vercel 배포 준비 완료 가이드 업데이트
