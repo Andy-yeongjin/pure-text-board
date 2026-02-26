@@ -1,36 +1,16 @@
-# Research: Post View Count & Architecture Migration
+# Research: Home Page Redesign & Security Finalization
 
 ## Decision Log
 
-### D1: 데이터베이스 접근 방식 (Better-SQLite3 전환)
-- **Decision**: `PrismaClient`를 완전히 제거하고 `better-sqlite3`를 사용하여 직접 SQL 쿼리를 수행함.
-- **Rationale**: 프로젝트 헌장(Constitution v1.4.0)의 "공통 레이어에서의 ORM 배제 및 순수 SQLite 사용 원칙"을 준수하고 추상화 오버헤드를 최소화함.
-- **Result**: `src/prisma`를 `src/db`로 리네임하고, `src/lib/db.ts` 싱글톤 패턴 도입.
+### D6: 메인화면 미니멀리즘 (Home Page Redesign)
+- **Decision**: 메인화면에서 최근/인기 게시물 목록을 제거하고 히어로 섹션과 심플 통계로 구성함.
+- **Rationale**: 사용자가 서비스에 접속했을 때 복잡한 정보 대신 "순수 텍스트 소통"이라는 본질적 가치에 먼저 집중하게 하기 위함.
+- **Result**: 목록 로딩으로 인한 초기 부하 감소 및 시각적 무게감 확보.
 
-### D2: 조회수 증가 로직 (Atomic Update)
-- **Decision**: 게시글 상세 조회 API 호출 시 SQL의 `UPDATE` 문을 사용하여 원자적으로 조회수를 증가시킴.
-- **Rationale**: 데이터 일관성을 보장하고 네트워크 요청 횟수를 줄임.
+### D7: 공통 페이지 스타일 계승 (Theme Integration)
+- **Decision**: 공통 서버의 HTML 응답 스타일을 프로젝트의 CSS 변수(`Indigo`)와 일치시킴.
+- **Rationale**: 인프라 페이지와 서비스 페이지 간의 단절감을 없애 사용자에게 일관된 브랜드 경험을 제공하기 위함.
 
-### D3: UI 컴포넌트 데이터 통합
-- **Decision**: `LikeButton` 컴포넌트 내부에 조회수(`viewCount`) 표시를 통합함.
-- **Rationale**: 상호작용 영역의 시각적 일관성을 확보하고 코드 재사용성을 높임.
-
-### D4: 서버 사이드 쿠키 전달 (Auth Forwarding)
-- **Decision**: Next.js 서버 컴포넌트(`page.tsx`)에서 API 호출 시 브라우저의 모든 쿠키를 `headers`에 담아 전달함.
-- **Rationale**: 서버 간 통신 시에도 로그인 토큰 및 비밀글 권한 쿠키(`private_access_*`)를 검증하기 위함.
-
-### D5: 공통 서버 UI 위임 (UI Delegation)
-- **Decision**: 공통 서버(`common/server.js`)가 직접 렌더링하던 `/login` 화면을 제거하고 Next.js 앱의 커스텀 페이지로 위임함.
-- **Rationale**: 프로젝트 전체의 디자인 톤앤매너(Indigo 테마) 일관성을 유지하기 위함.
-
-## Technical Context
-
-### Dependencies
-- `better-sqlite3`: 로컬 SQLite 파일 직접 접근.
-- `dotenv`: 공통 서버와 프로젝트 간 `JWT_SECRET` 공유.
-- `bcryptjs`: 비밀번호 암호화 및 검증.
-
-### Patterns
-- **Singleton Database Connection**: 어플리케이션 전체에서 하나의 DB 연결 인스턴스 공유.
-- **Indigo & Clean Card UI**: 일관된 시각적 아이덴티티 적용.
-- **Permission-Based Content Visibility**: 작성자 여부와 쿠키 기반의 본문 노출 제어.
+### D8: 보안 정책 구체화 (Cookie Cleanup)
+- **Decision**: 로그아웃 시 와일드카드 패턴(`private_access_*`)을 사용하여 모든 세션 쿠키를 서버에서 제거하도록 결정.
+- **Rationale**: 개별 삭제 시 발생할 수 있는 누락 가능성을 차단하고 확실한 세션 종료를 보장함.

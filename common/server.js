@@ -58,34 +58,36 @@ export default function startSharedServer(projectDir, port = 3000) {
         <html lang="ko">
         <head>
           <meta charset="UTF-8">
-          <title>이용약관 | Common Infrastructure</title>
+          <title>이용약관 | PureText System</title>
           <style>
-            :root { --primary: #4f46e5; --text: #1e293b; --bg: #f8fafc; }
-            body { font-family: sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; padding: 40px 20px; }
-            .card { max-width: 800px; margin: 0 auto; background: #fff; padding: 40px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
-            h1 { color: var(--primary); border-bottom: 2px solid var(--bg); padding-bottom: 20px; margin-bottom: 30px; }
-            h2 { font-size: 1.2rem; margin-top: 30px; }
-            .footer { margin-top: 40px; text-align: center; color: #64748b; font-size: 0.9rem; }
-            .btn { display: inline-block; margin-top: 20px; padding: 10px 20px; background: var(--primary); color: #fff; text-decoration: none; border-radius: 6px; }
+            :root { --primary: #4f46e5; --primary-hover: #4338ca; --text: #1e293b; --bg: #f8fafc; --card: #ffffff; }
+            body { font-family: 'Pretendard', -apple-system, sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; padding: 60px 20px; margin: 0; }
+            .card { max-width: 800px; margin: 0 auto; background: var(--card); padding: 50px; border-radius: 16px; box-shadow: 0 10px 25px -5px rgb(0 0 0 / 0.1); border: 1px solid #e2e8f0; }
+            h1 { color: var(--text); font-size: 2.2rem; font-weight: 800; letter-spacing: -1px; margin-bottom: 40px; border-bottom: 4px solid var(--primary); display: inline-block; padding-bottom: 8px; }
+            h2 { font-size: 1.25rem; margin-top: 40px; font-weight: 700; color: var(--primary); }
+            p { color: #475569; margin-bottom: 20px; }
+            .footer { margin-top: 50px; text-align: center; color: #94a3b8; font-size: 0.9rem; }
+            .btn { display: inline-flex; align-items: center; margin-top: 30px; padding: 12px 28px; background: var(--primary); color: #fff; text-decoration: none; border-radius: 10px; font-weight: 700; transition: background 0.2s; }
+            .btn:hover { background: var(--primary-hover); }
           </style>
         </head>
         <body>
           <div class="card">
             <h1>이용약관 및 정책</h1>
-            <p>본 서비스는 공통 인프라(Common Infrastructure)를 통해 제공되는 통합 서비스입니다.</p>
+            <p>본 서비스는 <strong>PureText 공통 인프라</strong>를 통해 제공되는 통합 커뮤니티 서비스입니다.</p>
             
             <h2>1. 서비스 이용</h2>
-            <p>사용자는 본 인프라를 통해 제공되는 모든 게시판 및 커뮤니티 서비스를 자유롭게 이용할 수 있으나, 타인의 권리를 침해하거나 불법적인 콘텐츠를 게시해서는 안 됩니다.</p>
+            <p>사용자는 본 인프라를 통해 제공되는 모든 게시판 서비스를 자유롭게 이용할 수 있으나, 타인의 권리를 침해하거나 불법적인 콘텐츠를 게시해서는 안 됩니다. 모든 텍스트는 시스템 필터링을 거칠 수 있습니다.</p>
 
             <h2>2. 개인정보 처리방침</h2>
-            <p>회사는 사용자의 이메일과 이름을 서비스 제공 목적으로 수집하며, 이는 암호화되어 안전하게 관리됩니다. 수집된 정보는 법령에 정한 경우를 제외하고 제3자에게 제공되지 않습니다.</p>
+            <p>회사는 서비스 제공을 위해 최소한의 정보(이메일, 이름)를 수집하며, 모든 비밀번호는 단방향 암호화(bcrypt)되어 안전하게 보관됩니다. 수집된 정보는 서비스 목적 외에 제3자에게 제공되지 않습니다.</p>
 
-            <h2>3. 책임의 한계</h2>
-            <p>본 서비스는 프로토타입 상태이며, 데이터의 영구적 보존을 보장하지 않습니다. 중요한 데이터는 반드시 별도로 백업하시기 바랍니다.</p>
+            <h2>3. 보안 및 책임</h2>
+            <p>비밀글 기능은 세션 기반 쿠키로 보호되나, 공용 PC 사용 시 반드시 로그아웃을 권장합니다. 본 서비스는 프로토타입 상태이며 데이터의 영구 보존을 법적으로 보장하지 않습니다.</p>
             
-            <a href="javascript:history.back()" class="btn">이전으로 돌아가기</a>
+            <a href="javascript:history.back()" class="btn">← 이전으로 돌아가기</a>
           </div>
-          <div class="footer">© 2026 Common Infrastructure System. All rights reserved.</div>
+          <div class="footer">© 2026 PureText Community System. All rights reserved.</div>
         </body>
         </html>
       `);
@@ -100,19 +102,21 @@ export default function startSharedServer(projectDir, port = 3000) {
         <html lang="ko">
         <head>
           <meta charset="UTF-8">
-          <title>Error ${code} | Common System</title>
+          <title>Error ${code} | PureText System</title>
           <style>
-            body { background: #f8fafc; display: flex; justify-content: center; align-items: center; height: 100vh; font-family: sans-serif; margin: 0; }
-            .box { text-align: center; background: #fff; padding: 60px; border-radius: 16px; box-shadow: 0 10px 25px -5px rgb(0 0 0 / 0.1); max-width: 400px; }
-            .icon { font-size: 4rem; margin-bottom: 20px; display: block; }
-            h1 { color: #ef4444; margin: 0 0 10px 0; font-size: 3rem; }
-            p { color: #64748b; margin-bottom: 30px; }
-            .btn { padding: 12px 24px; background: #4f46e5; color: #fff; text-decoration: none; border-radius: 8px; font-weight: bold; }
+            :root { --primary: #4f46e5; --text: #1e293b; --bg: #f8fafc; }
+            body { background: var(--bg); display: flex; justify-content: center; align-items: center; height: 100vh; font-family: 'Pretendard', sans-serif; margin: 0; color: var(--text); }
+            .box { text-align: center; background: #fff; padding: 60px 40px; border-radius: 24px; box-shadow: 0 20px 50px -12px rgb(0 0 0 / 0.15); max-width: 450px; width: 90%; border: 1px solid #e2e8f0; }
+            .icon { font-size: 5rem; margin-bottom: 24px; display: block; filter: drop-shadow(0 10px 10px rgba(0,0,0,0.1)); }
+            h1 { color: #ef4444; margin: 0 0 16px 0; font-size: 4rem; font-weight: 900; letter-spacing: -2px; }
+            p { color: #64748b; margin-bottom: 40px; font-size: 1.1rem; line-height: 1.6; }
+            .btn { padding: 16px 32px; background: var(--primary); color: #fff; text-decoration: none; border-radius: 12px; font-weight: 800; display: inline-block; transition: transform 0.2s; }
+            .btn:hover { transform: translateY(-2px); }
           </style>
         </head>
         <body>
           <div class="box">
-            <span class="icon">⚠️</span>
+            <span class="icon">🚀</span>
             <h1>${code}</h1>
             <p>${msg}</p>
             <a href="/" class="btn">홈으로 돌아가기</a>

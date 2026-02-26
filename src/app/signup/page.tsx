@@ -39,9 +39,8 @@ export default function SignupPage() {
 
   return (
     <div className="container" style={{ minHeight: '80vh', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-      <NavBreadcrumb items={[{ label: 'Home', href: '/' }, { label: 'Signup' }]} />
       
-      <div className="card" style={{ maxWidth: '440px', margin: '40px auto', width: '100%' }}>
+      <div className="card" style={{ maxWidth: '440px', margin: '20px auto 40px auto', width: '100%' }}>
         <div style={{ padding: '40px' }}>
           <div style={{ textAlign: 'center', marginBottom: '40px' }}>
             <span style={{ fontSize: '3rem', marginBottom: '16px', display: 'block' }}>🚀</span>

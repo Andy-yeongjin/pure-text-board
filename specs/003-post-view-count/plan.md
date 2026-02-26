@@ -4,41 +4,31 @@
 
 ## Summary
 
-본 프로젝트는 게시글 조회수 표시 기능을 구현함과 동시에, 프로젝트 헌장을 준수하기 위해 **Prisma를 완전히 제거하고 순수 SQLite(`better-sqlite3`) 기반 아키텍처로 전환**하였습니다. 또한 로그인/회원가입 등 전체 UI의 톤앤매너를 통일하고 보안 및 개발 경험(DX)을 대폭 개선하였습니다.
+본 프로젝트는 조회수 기능을 넘어 서비스의 **본질적인 가치(텍스트 집중, 보안, 데이터)**를 강조하는 방향으로 아키텍처와 UI를 전면 개편하였습니다. Prisma를 제거하여 가벼운 성능을 확보하였고, 메인화면을 미니멀한 대시보드로 리모델링하여 사용자 경험을 고도화하였습니다.
 
 ## Technical Context
 
-- **Database**: Pure SQLite Mode (`src/db/dev.db`, `better-sqlite3`)
-- **Auth Strategy**: `JWT_SECRET` 공유 기반의 통합 인증 + `private_access_*` 기반 비밀글 세션 쿠키
-- **UI Theme**: Indigo & Clean Card (Vanilla CSS)
-- **DX Improvements**: 터미널 내 로컬 접속 URL 로깅, DB 데이터 확인 스크립트 제공
+### 🔑 Security & Auth
+- **Session**: `JWT` + `Session Cookies` 기반의 2중 보안.
+- **Cleanup**: 로그아웃 시 서버 측에서 모든 관련 쿠키를 명시적으로 파괴.
 
-## Constitution Check
+### 🎨 Minimalist UI Strategy
+- **Home**: 복잡한 목록형 데이터를 지양하고 **히어로 메시지**와 **핵심 지표(Stats)**만 노출.
+- **Consistency**: 프로젝트 전용 페이지와 공통 인프라 페이지의 시각적 경계를 허물고 Indigo 테마로 통합.
 
-- [x] **ORM 배제**: Prisma 패키지 삭제 및 로우 SQL 쿼리로 전환 완료.
-- [x] **단순성 유지**: `src/lib/db.ts` 싱글톤 패턴을 통한 가벼운 DB 접근 로직 구축.
-
-## Project Structure (New)
+## Project Structure (Final)
 
 ```text
 TEST001/
-├── common/
-│   └── server.js        # 공통 약관/에러 페이지 추가 및 로그아웃 쿠키 삭제 로직 강화
 ├── src/
-│   ├── db/              # SQLite 데이터 및 스키마 기록 (prisma 폴더 대체)
-│   ├── lib/
-│   │   ├── db.ts        # 메인 데이터베이스 연결 인스턴스 (PrismaClient 대체)
-│   │   └── auth.ts      # 서버 컴포넌트 쿠키 전달 및 권한 체크
-│   ├── components/      # LikeButton, CommentSection UI 고도화
-│   └── app/
-│       ├── login/       # 프로젝트 전용 커스텀 디자인 적용
-│       └── signup/      # 프로젝트 전용 커스텀 디자인 적용
+│   ├── app/
+│   │   ├── page.tsx     # [Home] 히어로 섹션 및 통계 기반 미니멀 대시보드
+│   │   ├── login/       # 중복 제거된 깔끔한 로그인 UI
+│   │   └── posts/       # 조회수가 통합된 게시판 시스템
+├── common/              # 테마 폴리싱이 완료된 공통 자산
 ```
 
 ## Implementation Strategy (DONE)
-
-1. **Architecture Transition**: Prisma를 제거하고 `better-sqlite3` 싱글톤 인스턴스 도입.
-2. **API Refactoring**: 모든 API 라우트를 순수 SQL 기반으로 재작성 및 조회수 증가 로직 포함.
-3. **Security Fixes**: 서버 컴포넌트 쿠키 전달 로직 구현 및 비밀글 2중 보안 적용.
-4. **UI Revamp**: 로그인, 회원가입, 댓글, 비밀번호 입력창의 디자인 통일 및 레이아웃 수정.
-5. **DX Polish**: 서버 구동 시 URL 로깅 및 DB 확인 도구(`check-db.js`) 제공.
+1. **Minimalism**: 메인화면의 불필요한 요소 제거 및 본질적 문구 도입.
+2. **Security High-water Mark**: 비밀글 및 로그아웃 보안 로직의 완결성 확보.
+3. **Architecture Stability**: 순수 SQLite 기반의 견고한 데이터 처리 레이어 구축.
