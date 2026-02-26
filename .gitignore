@@ -5,6 +5,11 @@ node_modules/
 
 # Testing
 coverage/
+playwright-report/
+test-results/
+
+# SQLite Backups
+*.db.bak
 
 # Next.js
 .next/
