@@ -22,7 +22,7 @@ src/
 ```
 
 ## Recent Changes
-- **Real-time Data & Cache Invalidation (2026-02-26)**: 대시보드 통계 실시간 반영을 위한 `force-dynamic` 설정 및 게시글 작성 시 목록/메인 캐시 무효화(`revalidatePath`) 로직 추가.
+- **Real-time Data & Cache Invalidation (2026-02-26)**: Sanity CDN 캐시 비활성화(`useCdn: false`) 및 `revalidatePath('/', 'layout')`를 통한 전역 캐시 무효화 로직 강화로 실시간 동기화 완벽 해결.
 - **Vercel Deployment (2026-02-26)**: Vercel CLI를 통한 프로젝트 연동, 환경 변수 자동화 설정 및 프로덕션 배포 완료.
 - **UI Stability Fix (2026-02-26)**: `NavBreadcrumb` 컴포넌트에서 `usePathname()`이 `null`을 반환할 때 발생하는 런타임 오류 해결.
 - **Home Page Revamp**: 본질에 집중한 히어로 섹션 및 서비스 통계 중심의 미니멀 디자인 적용.

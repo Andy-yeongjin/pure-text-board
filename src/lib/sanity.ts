@@ -9,7 +9,7 @@ export const client = createClient({
   projectId,
   dataset,
   apiVersion,
-  useCdn: process.env.NODE_ENV === 'production',
+  useCdn: false, // 실시간 데이터 반영을 위해 CDN 캐시 사용 안 함
 });
 
 // 쓰기 권한 클라이언트 (서버 사이드 전용)

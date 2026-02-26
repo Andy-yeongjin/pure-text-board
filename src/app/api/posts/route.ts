@@ -64,9 +64,9 @@ export async function POST(request: Request) {
       publishedAt: new Date().toISOString()
     });
 
-    // 캐시 무효화 (목록 및 대시보드 통계 갱신)
+    // 캐시 무효화 (모든 관련 경로 및 레이아웃 강제 갱신)
+    revalidatePath('/', 'layout'); // 최상단부터 모든 페이지 하위 캐시 무효화
     revalidatePath('/posts');
-    revalidatePath('/');
     revalidatePath('/api/posts');
     revalidatePath('/api/dashboard');
 

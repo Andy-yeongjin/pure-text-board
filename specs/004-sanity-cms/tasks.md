@@ -37,7 +37,8 @@
 - [x] T018 [BUG] `jsonwebtoken`, `cookie` 등 라이브러리의 TypeScript 타입 패키지(@types/*) 설치
 - [x] T019 [BUG] `NavBreadcrumb`의 `usePathname` null 참조 오류 해결 (UI 안정성 확보)
 - [x] T020 [FEAT] `revalidatePath` 및 `force-dynamic` 적용 (실시간 통계 및 목록 즉시 반영)
-- [x] T021 [FEAT] Vercel 연동 및 환경 변수 클라우드 설정 완료 (Production 배포)
-- [x] T022 `npm run build`를 통한 전체 프로젝트 빌드 무결성 확인
-- [x] T023 Jest 유닛 테스트 및 Playwright 통합 테스트 실행 확인
-- [x] T024 전체 서비스 통합 테스트 및 Vercel 배포 준비 완료 가이드 업데이트
+- [x] T021 [BUG] Sanity CDN 엣지 캐시 비활성화(`useCdn: false`) 및 전역 캐시 갱신(`layout`)을 통한 데이터 딜레이 해결
+- [x] T022 [FEAT] Vercel 연동 및 환경 변수 클라우드 설정 완료 (Production 배포)
+- [x] T023 `npm run build`를 통한 전체 프로젝트 빌드 무결성 확인
+- [x] T024 Jest 유닛 테스트 및 Playwright 통합 테스트 실행 확인
+- [x] T025 전체 서비스 통합 테스트 및 Vercel 배포 준비 완료 가이드 업데이트
