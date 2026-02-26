@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import db from '@/lib/db';
 import { getAuthUser } from '@/lib/auth';
-
-const prisma = new PrismaClient();
 
 export async function POST(
   request: Request,
@@ -14,23 +12,25 @@ export async function POST(
   const postId = parseInt(params.id);
 
   try {
-    const existing = await prisma.like.findUnique({
-      where: { userId_postId: { userId: user.id, postId } },
-    });
+    const existing = db.prepare('SELECT id FROM Like WHERE userId = ? AND postId = ?')
+      .get(user.id, postId);
 
-    if (existing) {
-      await prisma.like.delete({
-        where: { userId_postId: { userId: user.id, postId } },
-      });
-    } else {
-      await prisma.like.create({
-        data: { userId: user.id, postId },
-      });
-    }
+    db.transaction(() => {
+      if (existing) {
+        db.prepare('DELETE FROM Like WHERE userId = ? AND postId = ?')
+          .run(user.id, postId);
+      } else {
+        db.prepare('INSERT INTO Like (userId, postId) VALUES (?, ?)')
+          .run(user.id, postId);
+      }
+    })();
 
-    const count = await prisma.like.count({ where: { postId } });
-    return NextResponse.json({ liked: !existing, count });
+    const countResult = db.prepare('SELECT COUNT(*) as count FROM Like WHERE postId = ?')
+      .get(postId) as any;
+    
+    return NextResponse.json({ liked: !existing, count: countResult.count });
   } catch (error) {
+    console.error('Like toggle error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -1,42 +1,77 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import db from '@/lib/db';
 import { hasPrivateAccess, getAuthUser } from '@/lib/auth';
 import { filterPlainText } from '@/lib/text-filter';
 import bcrypt from 'bcryptjs';
-
-const prisma = new PrismaClient();
 
 export async function GET(
   request: Request,
   { params }: { params: { id: string } }
 ) {
-  // ... (기존 GET 로직 유지)
   const id = parseInt(params.id);
 
   try {
-    // 조회수 증가 및 관계 데이터 로드
-    const post = await prisma.post.update({
-      where: { id },
-      data: { viewCount: { increment: 1 } },
-      include: { 
-        author: { select: { name: true } },
-        likes: true,
-        comments: {
-          include: { author: { select: { name: true } } },
-          orderBy: { createdAt: 'asc' }
-        }
-      },
-    });
+    // 1. 조회수 증가
+    db.prepare('UPDATE Post SET viewCount = viewCount + 1 WHERE id = ?').run(id);
 
-    if (post.isPrivate) {
-      const allowed = hasPrivateAccess(id);
-      if (!allowed) {
-        return NextResponse.json({ ...post, content: null });
+    // 2. 게시글 상세 조회 (작성자 포함)
+    const post = db.prepare(`
+      SELECT p.*, u.name as authorName 
+      FROM Post p
+      JOIN User u ON p.authorId = u.id
+      WHERE p.id = ?
+    `).get(id);
+
+    if (!post) {
+      return NextResponse.json({ error: 'Post not found' }, { status: 404 });
+    }
+
+    // 3. 댓글 목록 조회 (작성자 포함)
+    const comments = db.prepare(`
+      SELECT c.*, u.name as authorName
+      FROM Comment c
+      JOIN User u ON c.authorId = u.id
+      WHERE c.postId = ? AND c.isDeleted = 0
+      ORDER BY c.createdAt ASC
+    `).all(id);
+
+    // 4. 좋아요 목록 조회
+    const likes = db.prepare('SELECT * FROM Like WHERE postId = ?').all(id);
+
+    // UI 호환성을 위한 데이터 가공
+    const formattedPost = {
+      ...post,
+      author: { name: post.authorName },
+      isPrivate: post.isPrivate === 1,
+      likes,
+      comments: comments.map((c: any) => ({
+        ...c,
+        author: { name: c.authorName },
+        isDeleted: c.isDeleted === 1
+      }))
+    };
+
+    // 비밀글 권한 체크 (작성자 본인이거나 비번 확인 쿠키가 있는 경우 허용)
+    const isActuallyPrivate = formattedPost.isPrivate === true || post.isPrivate === 1;
+    
+    if (isActuallyPrivate) {
+      const user = getAuthUser();
+      const isAuthor = user && user.id === formattedPost.authorId;
+      const hasCookie = hasPrivateAccess(id);
+
+      if (!isAuthor && !hasCookie) {
+        // 본문과 댓글을 모두 숨김
+        return NextResponse.json({ 
+          ...formattedPost, 
+          content: null, 
+          comments: [] 
+        });
       }
     }
 
-    return NextResponse.json(post);
+    return NextResponse.json(formattedPost);
   } catch (error) {
+    console.error('Fetch post detail error:', error);
     return NextResponse.json({ error: 'Post not found' }, { status: 404 });
   }
 }
@@ -51,29 +86,27 @@ export async function PATCH(
   const id = parseInt(params.id);
 
   try {
-    const post = await prisma.post.findUnique({ where: { id } });
+    const post = db.prepare('SELECT * FROM Post WHERE id = ?').get(id);
     if (!post) return NextResponse.json({ error: 'Post not found' }, { status: 404 });
     if (post.authorId !== user.id) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
     const { title, content, isPrivate, privatePw } = await request.json();
     
-    let updateData: any = {
-      title,
-      content: filterPlainText(content),
-      isPrivate,
-    };
-
+    let hashedPw = post.privatePw;
     if (isPrivate && privatePw) {
-      updateData.privatePw = await bcrypt.hash(privatePw, 10);
+      hashedPw = await bcrypt.hash(privatePw, 10);
     }
 
-    const updated = await prisma.post.update({
-      where: { id },
-      data: updateData,
-    });
+    db.prepare(`
+      UPDATE Post 
+      SET title = ?, content = ?, isPrivate = ?, privatePw = ?
+      WHERE id = ?
+    `).run(title, filterPlainText(content), isPrivate ? 1 : 0, hashedPw, id);
 
+    const updated = db.prepare('SELECT * FROM Post WHERE id = ?').get(id);
     return NextResponse.json(updated);
   } catch (error) {
+    console.error('Update post error:', error);
     return NextResponse.json({ error: 'Update failed' }, { status: 500 });
   }
 }
@@ -88,18 +121,22 @@ export async function DELETE(
   const id = parseInt(params.id);
 
   try {
-    const post = await prisma.post.findUnique({ where: { id } });
+    const post = db.prepare('SELECT * FROM Post WHERE id = ?').get(id);
     if (!post) return NextResponse.json({ error: 'Post not found' }, { status: 404 });
     if (post.authorId !== user.id) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
-    // 연관된 댓글, 좋아요 먼저 삭제 (제약 조건에 따라 필요할 수 있음)
-    await prisma.comment.deleteMany({ where: { postId: id } });
-    await prisma.like.deleteMany({ where: { postId: id } });
+    // 연관 데이터 삭제 (트랜잭션 권장)
+    const deleteTx = db.transaction(() => {
+      db.prepare('DELETE FROM Comment WHERE postId = ?').run(id);
+      db.prepare('DELETE FROM Like WHERE postId = ?').run(id);
+      db.prepare('DELETE FROM Post WHERE id = ?').run(id);
+    });
     
-    await prisma.post.delete({ where: { id } });
+    deleteTx();
 
     return NextResponse.json({ success: true });
   } catch (error) {
+    console.error('Delete post error:', error);
     return NextResponse.json({ error: 'Delete failed' }, { status: 500 });
   }
 }

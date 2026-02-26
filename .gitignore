@@ -29,3 +29,4 @@ yarn-error.log*
 # OS Files
 .DS_Store
 Thumbs.db
+`n# SQLite Databases`n*.db

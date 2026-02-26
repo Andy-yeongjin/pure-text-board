@@ -1,4 +1,7 @@
+'use client';
+
 import React from 'react';
+import { PrivateAuthForm } from './PrivateAuthForm';
 
 interface PostDetailProps {
   post: {
@@ -13,6 +16,8 @@ interface PostDetailProps {
 }
 
 export const PostDetail = ({ post }: PostDetailProps) => {
+  const isLocked = post.isPrivate && post.content === null;
+
   return (
     <div className="card" style={{ marginBottom: '30px' }}>
       <div style={{ 
@@ -45,25 +50,60 @@ export const PostDetail = ({ post }: PostDetailProps) => {
           fontSize: '1.15rem', 
           lineHeight: 1.8, 
           whiteSpace: 'pre-wrap', 
-          padding: '30px', 
+          padding: isLocked ? '60px 30px' : '40px 30px', 
           backgroundColor: '#f8fafc', 
-          borderRadius: '12px',
+          borderRadius: '16px',
           border: '1px solid var(--border-color)',
-          color: '#334155'
+          color: '#334155',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: isLocked ? 'center' : 'flex-start',
+          textAlign: isLocked ? 'center' : 'left'
         }}>
-          {post.isPrivate && post.content === null ? (
-            <div style={{ textAlign: 'center', padding: '40px 0' }}>
-              <span style={{ fontSize: '3rem' }}>🔐</span>
-              <p style={{ color: '#ef4444', fontWeight: 'bold' }}>비밀글로 보호되고 있습니다.</p>
-              <p style={{ color: 'var(--text-muted)' }}>본문을 보려면 비밀번호를 입력하세요.</p>
+          {isLocked ? (
+            <div style={{ width: '100%', maxWidth: '500px' }}>
+              <span style={{ fontSize: '4rem', display: 'block', marginBottom: '24px' }}>🔐</span>
+              <h2 style={{ color: '#ef4444', fontWeight: '900', fontSize: '1.5rem', margin: '0 0 12px 0' }}>
+                비밀글로 보호되고 있습니다.
+              </h2>
+              <p style={{ color: 'var(--text-muted)', margin: 0, fontSize: '1rem', fontWeight: '500' }}>
+                게시글 비밀번호를 입력하여 본문을 확인하세요.
+              </p>
+              <PrivateAuthForm postId={post.id} />
             </div>
           ) : (
             post.content
           )}
         </div>
         
-        <div style={{ marginTop: '30px' }}>
-          <a href="/posts" style={{ color: 'var(--primary)', fontWeight: 'bold' }}>← 목록으로 돌아가기</a>
+        <div style={{ marginTop: '40px', borderTop: '1px solid var(--border-color)', paddingTop: '30px' }}>
+          <a 
+            href="/posts" 
+            style={{ 
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '12px 24px',
+              backgroundColor: 'white',
+              border: '2px solid var(--primary)',
+              color: 'var(--primary)',
+              borderRadius: '10px',
+              textDecoration: 'none',
+              fontWeight: '700',
+              transition: 'all 0.2s ease',
+              fontSize: '1rem'
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.backgroundColor = 'var(--primary)';
+              e.currentTarget.style.color = 'white';
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.backgroundColor = 'white';
+              e.currentTarget.style.color = 'var(--primary)';
+            }}
+          >
+            <span style={{ fontSize: '1.2rem' }}>📋</span> 목록으로 돌아가기
+          </a>
         </div>
       </div>
     </div>

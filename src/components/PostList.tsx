@@ -46,6 +46,7 @@ export const PostList = ({ posts }: { posts: PostSummary[] }) => {
                     {post.author.name}
                   </div>
                   <div style={{ display: 'flex', gap: '10px' }}>
+                    <span>👁 {post.viewCount}</span>
                     <span>❤ {post._count.likes}</span>
                     <span>💬 {post._count.comments}</span>
                   </div>

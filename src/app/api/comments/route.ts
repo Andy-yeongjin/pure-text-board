@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import db from '@/lib/db';
 import { getAuthUser } from '@/lib/auth';
-
-const prisma = new PrismaClient();
 
 export async function POST(request: Request) {
   const user = getAuthUser();
@@ -10,16 +8,28 @@ export async function POST(request: Request) {
 
   try {
     const { postId, content } = await request.json();
-    const comment = await prisma.comment.create({
-      data: {
-        postId,
-        content,
-        authorId: user.id,
-      },
-      include: { author: { select: { name: true } } },
+    
+    // 댓글 생성
+    const info = db.prepare(`
+      INSERT INTO Comment (postId, content, authorId, createdAt, isDeleted)
+      VALUES (?, ?, ?, datetime('now'), 0)
+    `).run(postId, content, user.id);
+
+    // 생성된 댓글 조회 (작성자 포함)
+    const comment = db.prepare(`
+      SELECT c.*, u.name as authorName
+      FROM Comment c
+      JOIN User u ON c.authorId = u.id
+      WHERE c.id = ?
+    `).get(info.lastInsertRowid);
+
+    return NextResponse.json({
+      ...comment,
+      author: { name: comment.authorName },
+      isDeleted: comment.isDeleted === 1
     });
-    return NextResponse.json(comment);
   } catch (error) {
+    console.error('Create comment error:', error);
     return NextResponse.json({ error: 'Failed to create comment' }, { status: 500 });
   }
 }
@@ -28,14 +38,12 @@ export async function DELETE(
   request: Request,
   { params }: { params: { id: string } }
 ) {
-  // 실제 서비스라면 본인 확인 로직 필요
   try {
-    await prisma.comment.update({
-      where: { id: parseInt(params.id) },
-      data: { isDeleted: true },
-    });
+    const id = parseInt(params.id);
+    db.prepare('UPDATE Comment SET isDeleted = 1 WHERE id = ?').run(id);
     return NextResponse.json({ success: true });
   } catch (error) {
+    console.error('Delete comment error:', error);
     return NextResponse.json({ error: 'Failed to delete comment' }, { status: 500 });
   }
 }

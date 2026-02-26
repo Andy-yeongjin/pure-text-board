@@ -27,7 +27,7 @@ export default function RootLayout({
           marginBottom: '40px'
         }}>
           <div style={{ display: 'flex', alignItems: 'center' }}>
-            <Link href="/posts" style={{ color: '#0f172a', textDecoration: 'none', fontWeight: '800', fontSize: '1.25rem', letterSpacing: '-0.5px' }}>
+            <Link href="/" style={{ color: '#0f172a', textDecoration: 'none', fontWeight: '800', fontSize: '1.25rem', letterSpacing: '-0.5px' }}>
               PureText
             </Link>
             <NavBreadcrumb />
