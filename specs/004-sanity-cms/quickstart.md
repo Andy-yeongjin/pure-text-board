@@ -4,9 +4,9 @@
 - Sanity 프로젝트 계정 및 Project ID 필요.
 - `.env` 파일에 아래 환경 변수 설정:
   ```env
-  SANITY_PROJECT_ID="your-project-id"
-  SANITY_DATASET="production"
-  SANITY_API_TOKEN="your-write-token"
+  NEXT_PUBLIC_SANITY_PROJECT_ID="tal1n2kk"
+  NEXT_PUBLIC_SANITY_DATASET="production"
+  SANITY_API_TOKEN="skvYUQ... (생략)"
   ```
 
 ## Setup Steps
